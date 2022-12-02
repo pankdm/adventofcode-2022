@@ -20,7 +20,9 @@ pub fn read_main_input() -> Vec<String> {
     if args.len() >= 2 {
         file = args[1].to_string()
     }
-    read_input(&format!("input/dayNN/{}", file))
+    let path = format!("input/dayNN/{}", file);
+    read_input(&path)
+    // read_input_as_string(&path)
 }
 
 #[cfg(test)]
