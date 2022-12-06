@@ -60,6 +60,7 @@ pub fn parts_impl(lines: &Vec<String>, is_part2: bool) -> i64 {
     loop {
         let line = lines[index].clone().to_vec();
         if line[1] == '1' {
+            index += 1;
             break;
         }
         index += 1;
@@ -77,7 +78,6 @@ pub fn parts_impl(lines: &Vec<String>, is_part2: bool) -> i64 {
     }
 
     // empty line
-    index += 1;
     index += 1;
     loop {
         if index >= lines.len() {
