@@ -18,7 +18,7 @@ use days::*;
 fn main() {
     let now = Instant::now();
 
-    day16::main();
+    day18::main();
 
     let elapsed_ms = now.elapsed().as_millis();
     println!("Finished in {}ms", elapsed_ms);
