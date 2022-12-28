@@ -45,11 +45,11 @@ mod tests {
 
 #[derive(Debug)]
 struct Rope {
-    head: Vector2d,
-    tail: Vector2d,
+    head: Vec2,
+    tail: Vec2,
 }
 
-fn vec_abs(v: Vector2d) -> i64 {
+fn vec_abs(v: Vec2) -> i64 {
     v.x.abs() + v.y.abs()
 }
 
@@ -61,27 +61,27 @@ impl Rope {
             return;
         }
         if v.x.abs() == 0 || v.y.abs() == 0 {
-            self.tail = self.tail + Vector2d::new(v.x.signum(), v.y.signum());
+            self.tail = self.tail + Vec2::new(v.x.signum(), v.y.signum());
         } else {
             if abs == 2 {
                 return;
             }
-            self.tail = self.tail + Vector2d::new(v.x.signum(), v.y.signum());
+            self.tail = self.tail + Vec2::new(v.x.signum(), v.y.signum());
         }
     }
 
-    fn step(&mut self, dir: Vector2d) {
+    fn step(&mut self, dir: Vec2) {
         self.head = self.head + dir;
         self.update();
     }
 }
 
 struct BigRope {
-    knots: Vec<Vector2d>,
+    knots: Vec<Vec2>,
 }
 
 impl BigRope {
-    fn step(&mut self, dir: Vector2d) {
+    fn step(&mut self, dir: Vec2) {
         self.knots[0] = self.knots[0] + dir;
         self.update_all();
     }
@@ -101,12 +101,12 @@ impl BigRope {
             return;
         }
         if v.x.abs() == 0 || v.y.abs() == 0 {
-            self.knots[b] = tail + Vector2d::new(v.x.signum(), v.y.signum());
+            self.knots[b] = tail + Vec2::new(v.x.signum(), v.y.signum());
         } else {
             if abs == 2 {
                 return;
             }
-            self.knots[b] = tail + Vector2d::new(v.x.signum(), v.y.signum());
+            self.knots[b] = tail + Vec2::new(v.x.signum(), v.y.signum());
         }
     }
 }
@@ -120,8 +120,8 @@ pub fn main() {
 
 pub fn part1(lines: &Vec<String>) -> i64 {
     let mut rope = Rope {
-        head: Vector2d::new(0, 0),
-        tail: Vector2d::new(0, 0),
+        head: Vec2::new(0, 0),
+        tail: Vec2::new(0, 0),
     };
     let mut visited = HashSet::new();
     for line in lines {
@@ -135,7 +135,7 @@ pub fn part1(lines: &Vec<String>) -> i64 {
             _ => unreachable!(),
         };
         for i in 0..times {
-            rope.step(Vector2d::new(dir.0, dir.1));
+            rope.step(Vec2::new(dir.0, dir.1));
             visited.insert(rope.tail);
             // println!(
             //     "-> ({}, {}) ({}, {})",
@@ -149,7 +149,7 @@ pub fn part1(lines: &Vec<String>) -> i64 {
 pub fn part2(lines: &Vec<String>) -> i64 {
     let mut knots = Vec::new();
     for i in 0..10 {
-        knots.push(Vector2d::new(0, 0));
+        knots.push(Vec2::new(0, 0));
     }
     let mut rope = BigRope { knots };
     let mut visited = HashSet::new();
@@ -164,7 +164,7 @@ pub fn part2(lines: &Vec<String>) -> i64 {
             _ => unreachable!(),
         };
         for i in 0..times {
-            rope.step(Vector2d::new(dir.0, dir.1));
+            rope.step(Vec2::new(dir.0, dir.1));
             let tail = rope.knots.last().unwrap();
             visited.insert(tail.clone());
         }

@@ -58,30 +58,34 @@ pub fn to_lines(s: &str) -> Vec<String> {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq)]
-pub struct Vector2d {
+pub struct Vec2 {
     pub x: i64,
     pub y: i64,
 }
 
-impl Vector2d {
+impl Vec2 {
     pub fn new(x: i64, y: i64) -> Self {
-        Vector2d { x, y }
+        Vec2 { x, y }
     }
-    pub fn rotate_left(&self) -> Vector2d {
-        Vector2d {
+    pub fn from_tuple((x, y): (i64, i64)) -> Self {
+        Vec2 { x, y }
+    }
+
+    pub fn rotate_left(&self) -> Vec2 {
+        Vec2 {
             x: -self.y,
             y: self.x,
         }
     }
-    pub fn rotate_right(&self) -> Vector2d {
-        Vector2d {
+    pub fn rotate_right(&self) -> Vec2 {
+        Vec2 {
             x: self.y,
             y: -self.x,
         }
     }
 }
 
-impl Add for Vector2d {
+impl Add for Vec2 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Self {
@@ -91,7 +95,7 @@ impl Add for Vector2d {
     }
 }
 
-impl Mul<i64> for Vector2d {
+impl Mul<i64> for Vec2 {
     type Output = Self;
     fn mul(self, other: i64) -> Self {
         Self {
@@ -101,29 +105,29 @@ impl Mul<i64> for Vector2d {
     }
 }
 
-impl Mul<Vector2d> for i64 {
-    type Output = Vector2d;
-    fn mul(self, other: Vector2d) -> Vector2d {
+impl Mul<Vec2> for i64 {
+    type Output = Vec2;
+    fn mul(self, other: Vec2) -> Vec2 {
         other * self
     }
 }
 
-type Grid = Vec<Vec<char>>;
+type Grid = Vec<Vec<i64>>;
 
 pub trait GridExt {
-    fn get(&self, v: Vector2d) -> char;
-    fn inside(&self, v: Vector2d) -> bool;
-    fn set(&mut self, v: Vector2d, c: char);
+    fn get(&self, v: Vec2) -> i64;
+    fn inside(&self, v: Vec2) -> bool;
+    fn set(&mut self, v: Vec2, c: i64);
 }
 
 impl GridExt for Grid {
-    fn get(&self, v: Vector2d) -> char {
+    fn get(&self, v: Vec2) -> i64 {
         self[v.y as usize][v.x as usize]
     }
-    fn inside(&self, v: Vector2d) -> bool {
+    fn inside(&self, v: Vec2) -> bool {
         0 <= v.y && v.y < self.len() as i64 && 0 <= v.x && v.x < self[v.y as usize].len() as i64
     }
-    fn set(&mut self, v: Vector2d, c: char) {
+    fn set(&mut self, v: Vec2, c: i64) {
         self[v.y as usize][v.x as usize] = c;
     }
 }
@@ -158,6 +162,16 @@ pub trait ToVec {
 
 impl ToVec for str {
     fn to_vec(&self) -> Vec<char> {
+        self.chars().collect()
+    }
+}
+
+pub trait CollectStr {
+    fn cv(&self) -> Vec<char>;
+}
+
+impl CollectStr for str {
+    fn cv(&self) -> Vec<char> {
         self.chars().collect()
     }
 }

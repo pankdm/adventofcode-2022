@@ -46,11 +46,11 @@ mod tests {
 pub fn main() {
     let lines = read_main_input();
 
-    // println!("part1 = {}", part1(&lines));
+    println!("part1 = {}", part1(&lines));
     println!("part2 = {}", part2(&lines));
 }
 
-pub fn dfs_from(start: (i64, i64), end: (i64, i64), grid: &Vec<Vec<i64>>) -> i64 {
+pub fn bfs_from(start: Vec2, end: Vec2, grid: &Vec<Vec<i64>>) -> i64 {
     let mut q = VecDeque::new();
     let mut visited = HashMap::new();
 
@@ -64,18 +64,12 @@ pub fn dfs_from(start: (i64, i64), end: (i64, i64), grid: &Vec<Vec<i64>>) -> i64
         if cur == end {
             break;
         }
-        for (dx, dy) in vec![(-1, 0), (1, 0), (0, -1), (0, 1)] {
-            let next_x = cur.0 + dx;
-            let next_y = cur.1 + dy;
-            if 0 <= next_x
-                && next_x < grid.len() as i64
-                && 0 <= next_y
-                && next_y < grid[0].len() as i64
-            {
-                let next_value = grid[next_x as usize][next_y as usize];
-                let cur_value = grid[cur.0 as usize][cur.1 as usize];
+        for d in vec![(-1, 0), (1, 0), (0, -1), (0, 1)] {
+            let next = cur + Vec2::from_tuple(d);
+            if grid.inside(next) {
+                let next_value = grid.get(next);
+                let cur_value = grid.get(cur);
                 if next_value <= cur_value + 1 {
-                    let next = (next_x, next_y);
                     if !visited.contains_key(&next) {
                         q.push_back((next, steps + 1));
                         visited.insert(next, steps + 1);
@@ -85,59 +79,59 @@ pub fn dfs_from(start: (i64, i64), end: (i64, i64), grid: &Vec<Vec<i64>>) -> i64
         }
     }
     if visited.contains_key(&end) {
-        return visited[&end];
+        visited[&end]
     } else {
-        return -1;
+        -1
     }
 }
 
 pub fn part1(lines: &Vec<String>) -> i64 {
     let mut grid = Vec::new();
 
-    let mut start = (0, 0);
-    let mut end = (0, 0);
+    let mut start = Vec2::new(0, 0);
+    let mut end = Vec2::new(0, 0);
 
-    for (row_idx, line) in lines.iter().enumerate() {
-        let chars = line.to_vec();
+    for (y, line) in lines.iter().enumerate() {
+        let chars = line.cv();
         let mut row = Vec::new();
-        for i in 0..chars.len() {
-            let ch = match chars[i] {
+        for x in 0..chars.len() {
+            let coords = Vec2::new(x as i64, y as i64);
+            let ch = match chars[x] {
                 'S' => {
-                    start = (row_idx as i64, i as i64);
+                    start = coords;
                     'a'
                 }
                 'E' => {
-                    end = (row_idx as i64, i as i64);
+                    end = coords;
                     'z'
                 }
-                _ => chars[i],
+                _ => chars[x],
             };
             row.push((ch as u8 - 'a' as u8) as i64)
         }
         grid.push(row)
     }
-    println!("start = {:?}, end = {:?}", start, end);
-    dfs_from(start, end, &grid)
+    bfs_from(start, end, &grid)
 }
 
 pub fn part2(lines: &Vec<String>) -> i64 {
     let mut grid = Vec::new();
 
     let mut starts = Vec::new();
-    let mut end = (0, 0);
+    let mut end = Vec2::new(0, 0);
 
-    for (row_idx, line) in lines.iter().enumerate() {
-        let chars = line.to_vec();
+    for (y, line) in lines.iter().enumerate() {
+        let chars = line.cv();
         let mut row = Vec::new();
-        for i in 0..chars.len() {
-            let coords = (row_idx as i64, i as i64);
-            let ch = match chars[i] {
+        for x in 0..chars.len() {
+            let coords = Vec2::new(x as i64, y as i64);
+            let ch = match chars[x] {
                 'S' => 'a',
                 'E' => {
                     end = coords;
                     'z'
                 }
-                _ => chars[i],
+                _ => chars[x],
             };
             if ch == 'a' {
                 starts.push(coords);
@@ -148,7 +142,7 @@ pub fn part2(lines: &Vec<String>) -> i64 {
     }
     starts
         .iter()
-        .map(|x| dfs_from(*x, end, &grid))
+        .map(|x| bfs_from(*x, end, &grid))
         .filter(|x| *x != -1)
         .min()
         .unwrap()
