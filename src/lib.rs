@@ -57,7 +57,7 @@ pub fn to_lines(s: &str) -> Vec<String> {
     split_string(&s.trim().to_string(), "\n")
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Default)]
 pub struct Vec2 {
     pub x: i64,
     pub y: i64,
@@ -112,22 +112,20 @@ impl Mul<Vec2> for i64 {
     }
 }
 
-type Grid = Vec<Vec<i64>>;
-
-pub trait GridExt {
-    fn get(&self, v: Vec2) -> i64;
+pub trait GenericGrid<T> {
+    fn get(&self, v: Vec2) -> T;
     fn inside(&self, v: Vec2) -> bool;
-    fn set(&mut self, v: Vec2, c: i64);
+    fn set(&mut self, v: Vec2, c: T);
 }
 
-impl GridExt for Grid {
-    fn get(&self, v: Vec2) -> i64 {
-        self[v.y as usize][v.x as usize]
+impl<T: Clone> GenericGrid<T> for Vec<Vec<T>> {
+    fn get(&self, v: Vec2) -> T {
+        self[v.y as usize][v.x as usize].clone()
     }
     fn inside(&self, v: Vec2) -> bool {
         0 <= v.y && v.y < self.len() as i64 && 0 <= v.x && v.x < self[v.y as usize].len() as i64
     }
-    fn set(&mut self, v: Vec2, c: i64) {
+    fn set(&mut self, v: Vec2, c: T) {
         self[v.y as usize][v.x as usize] = c;
     }
 }
